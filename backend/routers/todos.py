@@ -5,6 +5,7 @@ from typing import Annotated
 from ..database import SessionLocal
 from .. import schemas
 from .. import models
+from .auth import get_current_user
 
 
 router = APIRouter(prefix="/todos", tags=["todos"])
@@ -19,39 +20,56 @@ def get_db():
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def read_all(db: db_dependency):
-    return db.query(models.Todos).all()
+async def read_all(
+    user: user_dependency,
+    db: db_dependency
+):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    
+    return db.query(models.Todos).filter(models.Todos.owner_id == user.get("id", None)).all()
 
 
 @router.get(
-    "/todo/{todo_id}/",
+    "/{todo_id}/",
     response_model=schemas.TodosRequest,
     status_code=status.HTTP_200_OK,
 )
 async def read_todo(
-    db: db_dependency, todo_id: int = Path(gt=0, title="The ID of the todo to read")
+    user: user_dependency,
+    db: db_dependency, 
+    todo_id: int = Path(gt=0, title="The ID of the todo to read")
 ):
-    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    
+    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id")).first()
     if todo_model is not None:
         return todo_model
     raise HTTPException(status_code=404, detail="Todo not found")
 
 
 @router.post(
-    "/todo/", response_model=schemas.TodosRequest, status_code=status.HTTP_201_CREATED
+    "/", response_model=schemas.TodosRequest, status_code=status.HTTP_201_CREATED
 )
-async def create_todo(db: db_dependency, todo: schemas.TodosRequest):
-    todo_model = models.Todos(**todo.model_dump())
+async def create_todo(user: user_dependency, db: db_dependency, todo: schemas.TodosRequest):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    
+    print(f"the user is {user}")
+
+    todo_model = models.Todos(**todo.model_dump(), owner_id=user.get("id", None))
     db.add(todo_model)
     db.commit()
     db.refresh(todo_model)
     return todo_model
 
 
-@router.put("/todo/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
     db: db_dependency,
     todo: schemas.TodosRequest,
@@ -70,7 +88,7 @@ async def update_todo(
     raise HTTPException(status_code=404, detail="Todo not found")
 
 
-@router.delete("/todo/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
     db: db_dependency, todo_id: int = Path(gt=0, title="The ID of the todo to delete")
 ):
