@@ -7,7 +7,7 @@ from .. import schemas
 from .. import models
 
 
-router = APIRouter()
+router = APIRouter(prefix="/todos", tags=["todos"])
 
 
 def get_db():
