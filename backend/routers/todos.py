@@ -24,14 +24,18 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def read_all(
-    user: user_dependency,
-    db: db_dependency
-):
+async def read_all(user: user_dependency, db: db_dependency):
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-    
-    return db.query(models.Todos).filter(models.Todos.owner_id == user.get("id", None)).all()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+
+    return (
+        db.query(models.Todos)
+        .filter(models.Todos.owner_id == user.get("id", None))
+        .all()
+    )
 
 
 @router.get(
@@ -41,13 +45,20 @@ async def read_all(
 )
 async def read_todo(
     user: user_dependency,
-    db: db_dependency, 
-    todo_id: int = Path(gt=0, title="The ID of the todo to read")
+    db: db_dependency,
+    todo_id: int = Path(gt=0, title="The ID of the todo to read"),
 ):
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-    
-    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id")).first()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+
+    todo_model = (
+        db.query(models.Todos)
+        .filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id"))
+        .first()
+    )
     if todo_model is not None:
         return todo_model
     raise HTTPException(status_code=404, detail="Todo not found")
@@ -56,10 +67,15 @@ async def read_todo(
 @router.post(
     "/", response_model=schemas.TodosRequest, status_code=status.HTTP_201_CREATED
 )
-async def create_todo(user: user_dependency, db: db_dependency, todo: schemas.TodosRequest):
+async def create_todo(
+    user: user_dependency, db: db_dependency, todo: schemas.TodosRequest
+):
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-    
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+
     print(f"the user is {user}")
 
     todo_model = models.Todos(**todo.model_dump(), owner_id=user.get("id", None))
@@ -77,9 +93,16 @@ async def update_todo(
     todo_id: int = Path(gt=0, title="The ID of the todo to update"),
 ):
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-    
-    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id")).first()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+
+    todo_model = (
+        db.query(models.Todos)
+        .filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id"))
+        .first()
+    )
     if todo_model is not None:
         todo_model.title = todo.title
         todo_model.description = todo.description
@@ -95,13 +118,20 @@ async def update_todo(
 @router.delete("/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
     user: user_dependency,
-    db: db_dependency, 
-    todo_id: int = Path(gt=0, title="The ID of the todo to delete")
+    db: db_dependency,
+    todo_id: int = Path(gt=0, title="The ID of the todo to delete"),
 ):
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-    
-    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id")).first()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+
+    todo_model = (
+        db.query(models.Todos)
+        .filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id"))
+        .first()
+    )
     if todo_model is not None:
         db.delete(todo_model)
         db.commit()
