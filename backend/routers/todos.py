@@ -71,11 +71,15 @@ async def create_todo(user: user_dependency, db: db_dependency, todo: schemas.To
 
 @router.put("/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
+    user: user_dependency,
     db: db_dependency,
     todo: schemas.TodosRequest,
     todo_id: int = Path(gt=0, title="The ID of the todo to update"),
 ):
-    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    
+    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id")).first()
     if todo_model is not None:
         todo_model.title = todo.title
         todo_model.description = todo.description
@@ -90,9 +94,14 @@ async def update_todo(
 
 @router.delete("/{todo_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(
-    db: db_dependency, todo_id: int = Path(gt=0, title="The ID of the todo to delete")
+    user: user_dependency,
+    db: db_dependency, 
+    todo_id: int = Path(gt=0, title="The ID of the todo to delete")
 ):
-    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    
+    todo_model = db.query(models.Todos).filter(models.Todos.id == todo_id, models.Todos.owner_id == user.get("id")).first()
     if todo_model is not None:
         db.delete(todo_model)
         db.commit()
