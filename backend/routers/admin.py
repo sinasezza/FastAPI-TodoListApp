@@ -1,10 +1,9 @@
-from fastapi import APIRouter, HTTPException, Path, Query, Depends
+from fastapi import APIRouter, HTTPException, Path, Depends
 from starlette import status
 from sqlalchemy.orm import Session
 from typing import Annotated
-from ..database import SessionLocal
-from .. import schemas
-from .. import models
+from database import SessionLocal
+import models
 from .auth import get_current_user
 
 

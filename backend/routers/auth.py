@@ -6,8 +6,10 @@ from sqlalchemy.orm import Session
 from starlette import status
 from typing import Annotated
 from jose import JWTError, jwt
-from ..database import SessionLocal
-from .. import models, schemas, config
+from database import SessionLocal
+import models
+import schemas
+import config
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
