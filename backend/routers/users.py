@@ -63,3 +63,26 @@ async def change_password(
     db.commit()
     db.refresh(user_model)
     return
+
+
+@router.put("/change-phone-number/", status_code=status.HTTP_202_ACCEPTED)
+async def change_phone_number(
+    user: user_dependency,
+    db: db_dependency,
+    userPhone: schemas.UserVerificationPhoneNumber,
+):
+    if user is None:
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication Failed."
+        )
+
+    user_model = (
+        db.query(models.Users).filter(models.Users.id == user.get("id")).first()
+    )
+
+    user_model.phone_number = userPhone.phone_number
+
+    db.add(user_model)
+    db.commit()
+    db.refresh(user_model)
+    return

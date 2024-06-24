@@ -27,6 +27,9 @@ class CreateUserRequest(BaseModel):
     last_name: str = Field(min_length=3, max_length=20)
     password: str = Field(min_length=6, max_length=255)
     role: str = Field(min_length=3)
+    phone_number: Optional[str] = Field(
+        min_length=10, max_length=11, default="09000000000"
+    )
 
 
 class Token(BaseModel):
@@ -37,3 +40,11 @@ class Token(BaseModel):
 class UserVerificationPassword(BaseModel):
     password: str
     new_password: str = Field(min_length=6, max_length=255)
+
+
+class UserVerificationPhoneNumber(BaseModel):
+    phone_number: str = Field(
+        min_length=10,
+        max_length=11,
+        pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$",
+    )

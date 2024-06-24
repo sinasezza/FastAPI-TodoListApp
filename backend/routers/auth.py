@@ -91,6 +91,7 @@ async def create_user(db: db_dependency, user: schemas.CreateUserRequest):
         role=user.role,
         hashed_password=bcrypt_context.hash(user.password),
         is_active=True,
+        phone_number=user.phone_number,
     )
     db.add(user_model)
     db.commit()
