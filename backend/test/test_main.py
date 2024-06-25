@@ -2,9 +2,9 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 from httpx import ASGITransport
-import main
+from ..main import app
 
-transport = ASGITransport(app=main.app)
+transport = ASGITransport(app=app)
 
 @pytest.mark.asyncio
 async def test_return_health_check():

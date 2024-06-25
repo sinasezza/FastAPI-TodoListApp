@@ -1,9 +1,9 @@
 from typing import Annotated
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from models import Base
-from database import engine, SessionLocal
-from routers import auth, todos, admin, users
+from .models import Base
+from .database import engine, SessionLocal
+from .routers import auth, todos, admin, users
 
 
 app = FastAPI()

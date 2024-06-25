@@ -2,9 +2,8 @@ from fastapi import APIRouter, HTTPException, Path, Query, Depends
 from starlette import status
 from sqlalchemy.orm import Session
 from typing import Annotated
-from database import SessionLocal
-import models
-import schemas
+from ..database import SessionLocal
+from .. import models, schemas
 from .auth import get_current_user
 
 

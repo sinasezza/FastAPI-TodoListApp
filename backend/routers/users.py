@@ -3,9 +3,8 @@ from starlette import status
 from sqlalchemy.orm import Session
 from typing import Annotated
 from passlib.context import CryptContext
-from database import SessionLocal
-import models
-import schemas
+from ..database import SessionLocal
+from .. import models, schemas
 from .auth import get_current_user
 
 
