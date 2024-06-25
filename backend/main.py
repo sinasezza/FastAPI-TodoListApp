@@ -1,14 +1,20 @@
+from typing import Annotated
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from typing import Annotated
-import models
+from models import Base
 from database import engine, SessionLocal
 from routers import auth, todos, admin, users
 
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
+
+
+@app.get("/healthy/")
+async def health_check():
+    return {"status": "healthy"}
+
 
 app.include_router(auth.router)
 app.include_router(todos.router)
