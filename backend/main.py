@@ -6,7 +6,7 @@ from .database import engine, SessionLocal
 from .routers import auth, todos, admin, users
 
 
-app = FastAPI()
+app: FastAPI = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
