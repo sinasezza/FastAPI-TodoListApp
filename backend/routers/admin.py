@@ -22,7 +22,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-@router.get("/todo", status_code=status.HTTP_200_OK)
+@router.get("/todo/", status_code=status.HTTP_200_OK)
 async def read_all(user: user_dependency, db: db_dependency):
     if user is None or user.get("user_role").casefold() not in ("admin", "superuser"):
         raise HTTPException(
