@@ -10,6 +10,7 @@ from starlette.staticfiles import StaticFiles
 from .database import SessionLocal, engine
 from .models import Base
 from .routers import admin, auth, todos, users
+from .apis import admin as admin_api, users as users_api, todos as todos_api, auth as auth_api
 from .config import BASE_DIR, templates
 
 
@@ -35,6 +36,11 @@ app.include_router(auth.router)
 app.include_router(todos.router)
 app.include_router(admin.router)
 app.include_router(users.router)
+
+app.include_router(admin_api.router, prefix="/api/admin")
+app.include_router(users_api.router, prefix="/api/users")
+app.include_router(auth_api.router, prefix="/api/auth")
+app.include_router(todos_api.router, prefix="/api/todos")
 
 
 def get_db():

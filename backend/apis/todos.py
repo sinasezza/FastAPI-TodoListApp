@@ -10,9 +10,9 @@ from starlette.responses import RedirectResponse
 from .. import models, schemas
 from ..database import SessionLocal
 from .auth import get_current_user
-from ..config import templates
 
-router = APIRouter(prefix="/todos", tags=["todos"], responses={404: {"description": "Not found"}})
+
+router = APIRouter(tags=["todos_api"])
 
 
 def get_db():
@@ -26,18 +26,20 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
-    
 
-@router.get("/", response_class=HTMLResponse)
-async def read_all_by_user(request: Request, db: Session = Depends(get_db)):
-
-    user = await get_current_user(request)
+@router.get("/", status_code=status.HTTP_200_OK)
+async def read_all(user: user_dependency, db: db_dependency):
     if user is None:
-        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
 
-    todos = db.query(models.Todos).filter(models.Todos.owner_id == user.get("id")).all()
-
-    return templates.TemplateResponse("home.html", {"request": request, "todos": todos, "user": user})
+    return (
+        db.query(models.Todos)
+        .filter(models.Todos.owner_id == user.get("id", None))
+        .all()
+    )
 
 
 @router.get(
