@@ -10,7 +10,6 @@ app.dependency_overrides[get_db] = utils.override_get_db
 app.dependency_overrides[get_current_user] = utils.override_get_current_user
 
 
-
 async def test_admin_read_all_authenticated(test_todo):
     async with AsyncClient(transport=utils.transport) as client:
         response = await client.get("http://127.0.0.1:8000/admin/todo/")
@@ -25,19 +24,18 @@ async def test_admin_read_all_authenticated(test_todo):
                 "owner_id": 1,
             }
         ]
-        
 
 
 async def test_admin_delete_todo(test_todo):
     async with AsyncClient(transport=utils.transport) as client:
         response = await client.delete("http://127.0.0.1:8000/admin/todo/1/")
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        
+
         db = utils.TestingSessionLocal()
         model = db.query(Todos).filter(Todos.id == 1).first()
         assert model is None
         db.close()
-        
+
 
 async def test_admin_delete_todo_not_fount():
     async with AsyncClient(transport=utils.transport) as client:

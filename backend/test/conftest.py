@@ -1,13 +1,14 @@
 import pytest
 from pydantic import BaseModel
 from typing import Callable
+from ..routers.auth import bcrypt_context
+from ..models import Todos, Users
 from . import utils
-
 
 
 @pytest.fixture
 def test_todo():
-    todo = utils.Todos(
+    todo = Todos(
         title="learn to code",
         description="some description",
         priority=1,
@@ -21,5 +22,26 @@ def test_todo():
     yield todo
 
     with utils.engine.connect() as connection:
-        connection.execute(utils.text("DELETE FROM todos where 1=1;"))
+        connection.execute(utils.text("DELETE FROM todos WHERE 1=1;"))
+        connection.commit()
+
+
+@pytest.fixture
+def test_user():
+    user = Users(
+        username="testuser",
+        email="testemail@test.com",
+        hashed_password=bcrypt_context.hash("testpass"),
+        role="admin",
+        phone_number="1234567890",
+    )
+
+    db = utils.TestingSessionLocal()
+    db.add(user)
+    db.commit()
+
+    yield user
+
+    with utils.engine.connect() as connection:
+        connection.execute(utils.text("DELETE FROM users WHERE 1=1;"))
         connection.commit()

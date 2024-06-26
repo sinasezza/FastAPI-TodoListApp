@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 from .. import config as env_config
 from ..database import Base
 from ..main import app
-from ..models import Todos
 
 
 SQLALCHEMY_TEST_DATABASE_URL = env_config.TEST_DATABASE_URL
@@ -37,4 +36,3 @@ def override_get_current_user():
 
 
 transport = ASGITransport(app=app)
-
