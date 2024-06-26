@@ -1,0 +1,58 @@
+<div>
+  <nav class="bg-green-300 p-4 fixed w-full top-0 z-10">
+    <div class="container mx-auto flex justify-between items-center">
+      <a class="text-white text-2xl font-bold" href="/">Todo List App</a>
+      <button
+        class="text-white focus:outline-none md:hidden"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16m-7 6h7"
+          ></path>
+        </svg>
+      </button>
+      <div class="hidden md:flex items-center space-x-4" id="navbarNav">
+        <ul class="flex items-center space-x-4">
+          {% if user %}
+          <li class="text-white">
+            <a class="hover:text-gray-300" href="#">Home</a>
+          </li>
+          {% endif %}
+        </ul>
+        <ul class="flex items-center space-x-4 ml-auto">
+          {% if user %}
+          <li>
+            <a
+              type="button"
+              class="border border-white text-white hover:bg-white hover:text-blue-600 font-semibold py-2 px-4 rounded"
+              href="/auth/logout"
+              >Logout</a
+            >
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<script>
+  document.querySelector("button[data-toggle='collapse']").addEventListener("click", function() {
+    document.getElementById("navbarNav").classList.toggle("hidden");
+  });
+</script>

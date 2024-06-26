@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastAPI</title>
+{% extends 'base.html' %} 
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/todo/css/styles.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/generics/css/styles.css') }}">
-</head>
-<body>
-    <h1>Welcome to This FastAPI TodoApp.</h1>
-    <h2 class="text-3xl font-bold underline">hi there</h2>
-</body>
-</html>
+{% block content %}
+
+<h2>welcome</h2>
+<a href="/todos/">list of todos</a>
+
+{% endblock content %}

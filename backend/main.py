@@ -1,4 +1,3 @@
-import os
 from typing import Annotated
 from pathlib import Path
 
@@ -11,17 +10,15 @@ from starlette.staticfiles import StaticFiles
 from .database import SessionLocal, engine
 from .models import Base
 from .routers import admin, auth, todos, users
+from .config import BASE_DIR, templates
+
 
 app: FastAPI = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
 
-BASE_DIR = Path(__file__).resolve().parent
-templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
-
-
-app.mount("/static", StaticFiles(directory=str(Path(BASE_DIR, 'static'))), name="static")
+app.mount("/static", StaticFiles(directory=f"{BASE_DIR}/static"), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)

@@ -1,14 +1,21 @@
+import sys
+sys.path.append("..")
+
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette import status
+from starlette.responses import RedirectResponse
 
 from .. import models, schemas
 from ..database import SessionLocal
 from .auth import get_current_user
+from ..config import templates
 
-router = APIRouter(prefix="/todos", tags=["todos"])
+router = APIRouter(prefix="/todos", tags=["todos"], responses={404: {"description": "Not found"}})
 
 
 def get_db():
@@ -23,19 +30,31 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-@router.get("/", status_code=status.HTTP_200_OK)
-async def read_all(user: user_dependency, db: db_dependency):
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
+# @router.get("/", status_code=status.HTTP_200_OK)
+# async def read_all(user: user_dependency, db: db_dependency):
+#     if user is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Could not validate credentials",
+#         )
 
-    return (
-        db.query(models.Todos)
-        .filter(models.Todos.owner_id == user.get("id", None))
-        .all()
-    )
+#     return (
+#         db.query(models.Todos)
+#         .filter(models.Todos.owner_id == user.get("id", None))
+#         .all()
+#     )
+    
+
+@router.get("/", response_class=HTMLResponse)
+async def read_all_by_user(request: Request, db: Session = Depends(get_db)):
+
+    user = await get_current_user(request)
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
+    todos = db.query(models.Todos).filter(models.Todos.owner_id == user.get("id")).all()
+
+    return templates.TemplateResponse("home.html", {"request": request, "todos": todos, "user": user})
 
 
 @router.get(

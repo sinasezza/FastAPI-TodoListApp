@@ -1,17 +1,22 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette import status
+from starlette.responses import RedirectResponse, HTMLResponse
 
 from .. import config, models, schemas
 from ..database import SessionLocal
+from ..config import templates
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
 
 SECRET_KEY = config.JWT_SECRET_KEY
 ALGORITHM = config.JWT_ALGORITHM
@@ -63,23 +68,32 @@ def create_access_token(
     return jwt.encode(encode, SECRET_KEY, ALGORITHM)
 
 
-async def get_current_user(token: Annotated[str, Depends(oath2_bearer)]):
+async def get_current_user(request: Request):
     try:
+        token = request.cookies.get("access_token")
+        if token is None:
+            return None
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
-        user_role: str = payload.get("role")
         if username is None or user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate credentials",
-            )
-        return {"username": username, "id": user_id, "user_role": user_role}
+            logout(request)
+        return {"username": username, "id": user_id}
     except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
+        raise HTTPException(status_code=404, detail="Not found")
+    
+    
+@router.get("/logout")
+async def logout(request: Request):
+    msg = "Logout Successful"
+    response = templates.TemplateResponse("login.html", {"request": request, "msg": msg})
+    response.delete_cookie(key="access_token")
+    return response
+
+
+@router.get("/register", response_class=HTMLResponse)
+async def register(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -98,6 +112,11 @@ async def create_user(db: db_dependency, user: schemas.CreateUserRequest):
     db.commit()
     db.refresh(user_model)
     return user_model
+
+
+@router.get("/", response_class=HTMLResponse)
+async def authentication_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
 
 @router.post("/token/", response_model=schemas.Token)
