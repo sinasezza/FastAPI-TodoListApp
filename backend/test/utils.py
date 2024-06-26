@@ -1,12 +1,12 @@
 import pytest
 from httpx import ASGITransport
 from sqlalchemy import create_engine, text
-from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
 from .. import config as env_config
 from ..database import Base
 from ..main import app
-
 
 SQLALCHEMY_TEST_DATABASE_URL = env_config.TEST_DATABASE_URL
 

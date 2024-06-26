@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException, Path, Depends
-from starlette import status
-from sqlalchemy.orm import Session
 from typing import Annotated
-from ..database import SessionLocal
-from .. import models
-from .auth import get_current_user
 
+from fastapi import APIRouter, Depends, HTTPException, Path
+from sqlalchemy.orm import Session
+from starlette import status
+
+from .. import models
+from ..database import SessionLocal
+from .auth import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 

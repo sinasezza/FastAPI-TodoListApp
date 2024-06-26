@@ -1,8 +1,8 @@
 import pytest
 from fastapi import status
-from httpx import AsyncClient, ASGITransport
-from ..main import app
+from httpx import ASGITransport, AsyncClient
 
+from ..main import app
 
 transport = ASGITransport(app=app)
 

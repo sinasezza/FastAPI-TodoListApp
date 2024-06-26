@@ -1,5 +1,6 @@
-from pydantic import BaseModel, ValidationError, Field, ConfigDict
 from typing import Optional, Union
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 class TodosRequest(BaseModel):

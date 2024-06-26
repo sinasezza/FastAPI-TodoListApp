@@ -1,14 +1,15 @@
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette import status
-from typing import Annotated
-from jose import JWTError, jwt
-from ..database import SessionLocal
-from .. import models, schemas, config
 
+from .. import config, models, schemas
+from ..database import SessionLocal
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -35,7 +36,9 @@ bcrypt_context = CryptContext(
 oath2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
-def authenticate_user(username: str, password: str, db: Session):
+async def authenticate_user(
+    username: str, password: str, db: Session
+) -> models.Users | bool:
     user: models.Users = (
         db.query(models.Users).filter(models.Users.username == username).first()
     )
@@ -101,7 +104,7 @@ async def create_user(db: db_dependency, user: schemas.CreateUserRequest):
 async def login_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
 ):
-    user: models.Users | None = authenticate_user(
+    user: models.Users | None = await authenticate_user(
         form_data.username, form_data.password, db
     )
     if not user:

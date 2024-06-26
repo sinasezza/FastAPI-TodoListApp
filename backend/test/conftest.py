@@ -1,8 +1,10 @@
+from typing import Callable
+
 import pytest
 from pydantic import BaseModel
-from typing import Callable
-from ..routers.auth import bcrypt_context
+
 from ..models import Todos, Users
+from ..routers.auth import bcrypt_context
 from . import utils
 
 

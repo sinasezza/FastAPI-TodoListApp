@@ -1,10 +1,10 @@
 from fastapi import status
 from httpx import AsyncClient
+
 from ..main import app
 from ..models import Todos
-from ..routers.admin import get_db, get_current_user
+from ..routers.admin import get_current_user, get_db
 from . import utils
-
 
 app.dependency_overrides[get_db] = utils.override_get_db
 app.dependency_overrides[get_current_user] = utils.override_get_current_user

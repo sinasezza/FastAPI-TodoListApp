@@ -1,10 +1,11 @@
 from typing import Annotated
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from .models import Base
-from .database import engine, SessionLocal
-from .routers import auth, todos, admin, users
 
+from fastapi import Depends, FastAPI
+from sqlalchemy.orm import Session
+
+from .database import SessionLocal, engine
+from .models import Base
+from .routers import admin, auth, todos, users
 
 app: FastAPI = FastAPI()
 
