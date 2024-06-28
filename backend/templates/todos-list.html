@@ -1,0 +1,82 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+
+<div class="container mx-auto mt-10">
+  <div class="bg-white shadow-md rounded-lg text-center">
+    <div class="bg-blue-600 text-white py-4 rounded-t-lg">
+      <h2 class="text-xl font-bold">Your Todos!</h2>
+    </div>
+    <div class="p-6">
+      <h5 class="text-lg font-semibold mb-4">List of your Todos!</h5>
+      <p class="mb-6 text-gray-600">
+        Information regarding stuff that needs to be completed
+      </p>
+
+      <table class="min-w-full bg-white divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th class="py-2 px-4 text-left">#</th>
+            <th class="py-2 px-4 text-left">Info</th>
+            <th class="py-2 px-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for todo in todos %} 
+            {% if not todo.complete %}
+              <tr class="hover:bg-gray-100">
+                <td class="py-2 px-4">{{ loop.index }}</td>
+                <td class="py-2 px-4">{{ todo.title }}</td>
+                <td class="py-2 px-4">
+                  <button
+                    onclick="window.location.href='complete/{{ todo.id }}'"
+                    type="button"
+                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Complete
+                  </button>
+                  <button
+                    onclick="window.location.href='edit-todo/{{ todo.id }}'"
+                    type="button"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            {% else %}
+              <tr class="bg-green-100">
+                <td class="py-2 px-4">{{ loop.index }}</td>
+                <td class="py-2 px-4 line-through">{{ todo.title }}</td>
+                <td class="py-2 px-4">
+                  <button
+                    onclick="window.location.href='complete/{{ todo.id }}'"
+                    type="button"
+                    class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Undo
+                  </button>
+                  <button
+                    onclick="window.location.href='edit-todo/{{ todo.id }}'"
+                    type="button"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            {% endif %} 
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <a
+        href="/todos/add-todo/"
+        class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-4 inline-block"
+        >Add a new Todo!</a
+      >
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
