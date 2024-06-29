@@ -1,25 +1,23 @@
 from typing import Annotated
-from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.staticfiles import StaticFiles
 
+from .apis import admin as admin_api
+from .apis import auth as auth_api
+from .apis import todos as todos_api
+from .apis import users as users_api
+from .config import BASE_DIR, templates
 from .database import SessionLocal, engine
 from .models import Base
 from .routers import admin, auth, todos, users
-from .apis import (
-    admin as admin_api,
-    users as users_api,
-    todos as todos_api,
-    auth as auth_api,
-)
-from .config import BASE_DIR, templates
-
 
 app: FastAPI = FastAPI()
+
+app.add_middleware(AuthenticationMiddleware, backend=auth.JWTAuthenticationBackend())
 
 Base.metadata.create_all(bind=engine)
 

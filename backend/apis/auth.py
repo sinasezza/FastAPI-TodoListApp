@@ -8,11 +8,10 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette import status
-from starlette.responses import RedirectResponse, HTMLResponse
+from starlette.responses import HTMLResponse, RedirectResponse
 
 from .. import config, models, schemas
 from ..database import SessionLocal
-
 
 router = APIRouter(tags=["auth_api"])
 

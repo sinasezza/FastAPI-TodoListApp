@@ -13,6 +13,14 @@
 
 {% include 'navbar.html' %}
 
+<div>
+  {% if msg %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+      <span class="block sm:inline">{{ msg }}</span>
+    </div>
+  {% endif %}
+</div>
+
 <main class="mt-24">
   {% block content %} {% endblock  content %}
 </main>

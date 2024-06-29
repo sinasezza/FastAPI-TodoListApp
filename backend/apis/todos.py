@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Path, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -10,7 +10,6 @@ from starlette.responses import RedirectResponse
 from .. import models, schemas
 from ..database import SessionLocal
 from .auth import get_current_user
-
 
 router = APIRouter(tags=["todos_api"])
 
