@@ -16,27 +16,28 @@
       <table class="min-w-full bg-white divide-y divide-gray-200">
         <thead>
           <tr>
-            <th class="py-2 px-4 text-left">#</th>
-            <th class="py-2 px-4 text-left">Info</th>
-            <th class="py-2 px-4 text-left">Actions</th>
+            <th class="py-2 px-4 text-center">#</th>
+            <th class="py-2 px-4 text-center">Info</th>
+            <th class="py-2 px-4 text-center">Actions</th>
           </tr>
         </thead>
+        
         <tbody class="divide-y divide-gray-200">
           {% for todo in todos %} 
-            {% if not todo.complete %}
+            {% if not todo.completed %}
               <tr class="hover:bg-gray-100">
                 <td class="py-2 px-4">{{ loop.index }}</td>
                 <td class="py-2 px-4">{{ todo.title }}</td>
                 <td class="py-2 px-4">
                   <button
-                    onclick="window.location.href='complete/{{ todo.id }}'"
+                    onclick="window.location.href='complete/{{ todo.id }}/'"
                     type="button"
                     class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                   >
                     Complete
                   </button>
                   <button
-                    onclick="window.location.href='edit-todo/{{ todo.id }}'"
+                    onclick="window.location.href='edit-todo/{{ todo.id }}/'"
                     type="button"
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   >
@@ -50,14 +51,14 @@
                 <td class="py-2 px-4 line-through">{{ todo.title }}</td>
                 <td class="py-2 px-4">
                   <button
-                    onclick="window.location.href='complete/{{ todo.id }}'"
+                    onclick="window.location.href='complete/{{ todo.id }}/'"
                     type="button"
                     class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
                   >
                     Undo
                   </button>
                   <button
-                    onclick="window.location.href='edit-todo/{{ todo.id }}'"
+                    onclick="window.location.href='edit-todo/{{ todo.id }}/'"
                     type="button"
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   >

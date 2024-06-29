@@ -10,7 +10,12 @@ from starlette.staticfiles import StaticFiles
 from .database import SessionLocal, engine
 from .models import Base
 from .routers import admin, auth, todos, users
-from .apis import admin as admin_api, users as users_api, todos as todos_api, auth as auth_api
+from .apis import (
+    admin as admin_api,
+    users as users_api,
+    todos as todos_api,
+    auth as auth_api,
+)
 from .config import BASE_DIR, templates
 
 
