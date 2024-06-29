@@ -7,8 +7,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette import status
-from starlette.authentication import (AuthCredentials, AuthenticationBackend,
-                                      SimpleUser)
+from starlette.authentication import AuthCredentials, AuthenticationBackend, SimpleUser
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from .. import config, models
@@ -157,7 +156,9 @@ async def login(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/logout/")
 async def logout(request: Request):
-    response: Response = RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+    response: Response = RedirectResponse(
+        url="/auth/", status_code=status.HTTP_302_FOUND
+    )
     response.delete_cookie(key="access_token")
     return response
 
@@ -205,3 +206,61 @@ async def register_user(
 
     msg = "User successfully created"
     return templates.TemplateResponse("login.html", {"request": request, "msg": msg})
+
+
+@router.get("/change-password/", response_class=HTMLResponse)
+async def change_password_page(request: Request):
+    user = await get_current_user(request)
+    if user is None:
+        return RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+    return templates.TemplateResponse("change-password.html", {"request": request})
+
+
+@router.get("/profile/", response_class=HTMLResponse)
+async def get_user_profile(request: Request, db: Session = Depends(get_db)):
+    user = await get_current_user(request)
+    if user is None:
+        return RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+
+    profile = db.query(models.Users).filter(models.Users.id == user["id"]).first()
+
+    if profile is None:
+        return RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+
+    context = {"request": request, "user": user, "profile": profile}
+
+    return templates.TemplateResponse("profile.html", context=context)
+
+
+@router.post("/change-password/", response_class=HTMLResponse)
+async def change_password(
+    request: Request,
+    current_password: str = Form(...),
+    new_password: str = Form(...),
+    confirm_password: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    user = await get_current_user(request)
+    if user is None:
+        return RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+
+    if new_password != confirm_password:
+        return templates.TemplateResponse(
+            "change-password.html",
+            {"request": request, "error": "New passwords do not match"},
+        )
+
+    user_model = db.query(models.Users).filter(models.Users.id == user["id"]).first()
+    if not verify_password(current_password, user_model.hashed_password):
+        return templates.TemplateResponse(
+            "change-password.html",
+            {"request": request, "error": "Current password is incorrect"},
+        )
+
+    user_model.hashed_password = get_password_hash(new_password)
+    db.commit()
+
+    return templates.TemplateResponse(
+        "change-password.html",
+        {"request": request, "success": "Password changed successfully"},
+    )

@@ -1,0 +1,82 @@
+{% extends "base.html" %} 
+
+
+{% block content %}
+<div class="container mx-auto mt-20 p-4">
+  <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
+      User Profile
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700"
+            >Username</label
+          >
+          <p class="mt-1 text-lg font-semibold text-gray-900">
+            {{ profile.username }}
+          </p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <p class="mt-1 text-lg font-semibold text-gray-900">
+            {{ profile.email }}
+          </p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700"
+            >First Name</label
+          >
+          <p class="mt-1 text-lg font-semibold text-gray-900">
+            {{ profile.first_name }}
+          </p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700"
+            >Last Name</label
+          >
+          <p class="mt-1 text-lg font-semibold text-gray-900">
+            {{ profile.last_name }}
+          </p>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Role</label>
+          <p class="mt-1 text-lg font-semibold text-gray-900">
+            {{ profile.role or 'Not specified' }}
+          </p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700"
+            >Phone Number</label
+          >
+          <p class="mt-1 text-lg font-semibold text-gray-900">
+            {{ profile.phone_number or 'Not specified' }}
+          </p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700"
+            >Account Status</label
+          >
+          <p
+            class="mt-1 text-lg font-semibold {% if profile.is_active %}text-green-600{% else %}text-red-600{% endif %}"
+          >
+            {% if profile.is_active %}Active{% else %}Inactive{% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 flex justify-center">
+      <a
+        href="/auth/change-password/"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Change Password
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock content %}
