@@ -72,7 +72,7 @@ async def create_todo(
     return RedirectResponse(url="/todos", status_code=status.HTTP_302_FOUND)
 
 
-@router.get("/edit-todo/{todo_id}", response_class=HTMLResponse)
+@router.get("/edit-todo/{todo_id}/", response_class=HTMLResponse)
 async def edit_todo(request: Request, todo_id: int, db: Session = Depends(get_db)):
     user = await get_current_user(request)
     if user is None:
