@@ -232,6 +232,87 @@ async def get_user_profile(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("profile.html", context=context)
 
 
+@router.get("/edit-profile/", response_class=HTMLResponse)
+async def edit_profile_page(request: Request, db: Session = Depends(get_db)):
+    user_data = await get_current_user(request)
+    if user_data is None:
+        return RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+
+    # Fetch full user details from the database
+    user = db.query(models.Users).filter(models.Users.id == user_data["id"]).first()
+
+    return templates.TemplateResponse(
+        "edit-profile.html", {"request": request, "user": user}
+    )
+
+
+@router.post("/edit-profile/", response_class=HTMLResponse)
+async def edit_profile(
+    request: Request,
+    email: str = Form(...),
+    username: str = Form(...),
+    firstname: str = Form(...),
+    lastname: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    user_data = await get_current_user(request)
+    if user_data is None:
+        return RedirectResponse(url="/auth/", status_code=status.HTTP_302_FOUND)
+
+    user = db.query(models.Users).filter(models.Users.id == user_data["id"]).first()
+
+    # validating username and email for uniqueness
+    if username != user.username:
+        validation = (
+            db.query(models.Users).filter(models.Users.username == username).first()
+        )
+        if validation is not None:
+            return templates.TemplateResponse(
+                "edit-profile.html",
+                {
+                    "request": request,
+                    "user": user,
+                    "error": "Username already exists",
+                    "form_data": {
+                        "email": email,
+                        "username": username,
+                        "firstname": firstname,
+                        "lastname": lastname,
+                    },
+                },
+            )
+
+    if email != user.email:
+        validation = db.query(models.Users).filter(models.Users.email == email).first()
+        if validation is not None:
+            return templates.TemplateResponse(
+                "edit-profile.html",
+                {
+                    "request": request,
+                    "user": user,
+                    "error": "Email already exists",
+                    "form_data": {
+                        "email": email,
+                        "username": username,
+                        "firstname": firstname,
+                        "lastname": lastname,
+                    },
+                },
+            )
+
+    user.email = email
+    user.username = username
+    user.first_name = firstname
+    user.last_name = lastname
+
+    db.commit()
+
+    return templates.TemplateResponse(
+        "edit-profile.html",
+        {"request": request, "user": user, "success": "Profile updated"},
+    )
+
+
 @router.post("/change-password/", response_class=HTMLResponse)
 async def change_password(
     request: Request,
